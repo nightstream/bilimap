@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>弹幕地图</title>
+	<meta charset="UTF-8" data-vue-meta="true">
+    <style type="text/css">
+        body {width: 200px;}
+
+        ul#keylist {
+            list-style-type: none; 
+            width: 100%; 
+            padding-left: 0;
+        }
+
+        ul#keylist li {
+            padding: 5px 0;
+            line-height: 14px;
+            border-bottom: 1px dashed gray;
+        }
+
+        span.keyname {
+            display: inline-block;
+            width: 60%;
+            overflow: hidden;
+            font-size: 15px;
+        }
+
+        input.delbtn {
+            float: right;
+        }
+
+        div.handle {
+            transition: width 500ms;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        #inputbox input{ width: 98%; }
+
+        #morehandle {
+            width: 0px;
+            position: absolute;
+            bottom: 20px;
+        }
+
+        #export {
+            position: absolute;;
+            right: 16px;
+        }
+
+        #import {width: 72px;}
+    </style>
+</head>
+<body>
+    <div>
+        <h3 align="center" id="switch">弹幕规则</h3>
+        <ul id="keylist" style="">
+        </ul>
+        <div id="inputbox" class="handle">
+            <input type="text" name="key" id="key" placeholder="填入规则名称（必填）">
+            <input type="text" name="regx" id="regx" placeholder="填入弹幕正则表达式（必填）">
+        </div>
+        <div id="morehandle" class="handle" style="width: 0;">
+            <input type="file" id="import" name="dmfile" value="从文件导入" accept=".txt,.dmreg">
+            <input type="button" value="导出到文件" id="export"></input>
+        </div>
+    </div>
+    <script type="text/javascript" src="page/js/popup.js"></script>
+</body>
+</html>
