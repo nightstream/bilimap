@@ -43,10 +43,8 @@
         "unlimitedStorage",
         "https://*.bilibili.com/*"
     ],
-    "applications": {
-        "gecko": {
-            "id": "nightstream@foxmail.com"
-        }
+    "externally_connectable": {
+    	"matches": ["*://*.bilibili.com/*"]
     },
     "homepage_url": "https://github.com/nightstream/bilimap"
 }

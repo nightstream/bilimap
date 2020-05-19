@@ -1,6 +1,6 @@
 # bilimap
 
-bilimap是一个chrome插件，实现的主要功能是：利用B站（[bilibili](https://www.bilibili.com/)）良好的弹幕生态系统，在B站视频页面生成弹幕图表，展示符合特定规则的弹幕在某一时刻的数量。
+bilimap是一个浏览器插件，实现的主要功能是：利用B站（[bilibili](https://www.bilibili.com/)）良好的弹幕生态系统，在B站视频页面生成弹幕图表，展示符合特定规则的弹幕在某一时刻的数量。
 
 
 # 说明
@@ -18,11 +18,17 @@ bilimap只与B站存在网络交互，不会向任何服务器上传用户的个
 
 # 安装方式
 
+## chrome
+
 您可以使用chrome浏览器访问bilimap的chrome[商店页面](https://chrome.google.com/webstore/detail/bilimap/akmhahadmmjoidckjonlcbepkaloihed)点击“添加至chrome”直接安装(__版本略低，有些新功能可能不支持__)
 
 或者下载github库到电脑，开启chrome浏览器的“开发者模式”后，点击“加载已解压的扩展程序”，加载版本库内的src目录(__chrome官方不推荐__)
 
 ![开发者模式](https://github.com/nightstream/bilimap/blob/master/doc/%E6%88%AA%E5%9B%BE/dev_mode.png?raw=true)
+
+## firefox
+
+推荐您使用firefox浏览器访问bilimap的add-ons[产品页面](https://addons.mozilla.org/zh-CN/firefox/addon/bilimap/), 点击“添加到firefox”直接安装(__版本略低，有些新功能可能不支持__)
 
 
 # 功能介绍
@@ -102,16 +108,18 @@ bilimap只与B站存在网络交互，不会向任何服务器上传用户的个
 恰饭: (恰饭|硬广|广告|猝不及防)
 ```
 
-__可将以上文本以utf8格式保存为".txt"或".dmreg"文件后进行导入__
+您可以将以上文本以utf8格式保存为".txt"或".dmreg"文件后进行导入
 
-__您也可以选择从[doc/danmaku.dmreg](https://github.com/nightstream/bilimap/blob/master/doc/danmaku.dmreg?raw=true)下载dmreg文件，文件可使用记事本查看__
+您也可以选择从[doc/danmaku.dmreg](https://github.com/nightstream/bilimap/blob/master/doc/danmaku.dmreg?raw=true)下载dmreg文件，文件可使用记事本查看
 
 4. 点击导出，bilimap将会把已有的全部启用或未启用的弹幕规则存入dmreg文件并自动从本地下载(此处不连接任何远端服务器)
+
+**注意**: 由于firefox57版本之后官方已取消插件对blob对象的支持，所以目前导入导出弹幕规则的功能仅在chrome可用。
 
 
 # 其它
 
-bilimap的开发环境是chrome，其它任何浏览器均未测试。并且，bilimap插件的弹出页面挺不好看的。
+bilimap的主要开发环境是chrome和firefox，其它任何浏览器均未测试。
 
 bilimap的图标由[logoly](https://logoly.pro/)生成，弹幕数据图表使用[echarts](https://www.echartsjs.com/zh/index.html)生成，在bilimap中集成了**删减版**的echarts.min.js。
 

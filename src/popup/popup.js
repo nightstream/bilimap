@@ -1,6 +1,7 @@
 // 点击开启popup页面时触发
 var backpage = chrome.extension.getBackgroundPage();
 var keylist = [];
+var comfunc = new CompatibleBrowser();
 
 chrome.storage.sync.get({"keylist": []}, function(result) {
     keylist = result.keylist;
@@ -33,53 +34,55 @@ document.getElementById("regx").onkeyup = function(e){
     }
 };
 
-document.getElementById("switch").onclick = function(e) {
-    if (document.getElementById("morehandle").style.width == "0px"){
-        document.getElementById("inputbox").style.width = "0px";
-        document.getElementById("morehandle").style.width = "100%";
-    }else{
-        document.getElementById("inputbox").style.width = "100%";
-        document.getElementById("morehandle").style.width = "0px";
-    }
-};
-
-document.getElementById("import").onchange = function () {
-    if (this.files.length == 0)
-        return;
-    var file = this.files[0];
-    var reader = new FileReader();
-    reader.readAsArrayBuffer(file);
-
-    reader.onload = function() {
-        var str = Utf8ArrayToStr(new Uint8Array(this.result));
-        var regxlist = str.split("\n");
-        console.log(regxlist);
-        regxlist.forEach(function(item){
-            var item = item.trim();
-            var kvi = item.indexOf(":");
-            if (item.length == 0){
-                console.log("检测到空行, 跳过");
-            }else if (kvi < 0){
-                console.log("数据不符合条件, 跳过此行:" + item);
-            }else{
-                var key = item.slice(0, kvi).trim();
-                var regxstr = item.slice(kvi+1).trim();
-                updateUList(key, regxstr);
-            }
-        });
+if (comfunc.getBrowsertype() == "chrome"){
+    document.getElementById("switch").onclick = function(e) {
+        if (document.getElementById("morehandle").style.width == "0px"){
+            document.getElementById("inputbox").style.width = "0px";
+            document.getElementById("morehandle").style.width = "100%";
+        }else{
+            document.getElementById("inputbox").style.width = "100%";
+            document.getElementById("morehandle").style.width = "0px";
+        }
     };
-};
 
-document.getElementById("export").onclick = function () {
-    var blob, bloburl, content, regxstr = "";
-    for (var i = 0; i < keylist.length; i ++){
-        regxstr += keylist[i][0] + ": " + keylist[i][1] + "\r\n";
-    }
-    // blob = new Blob([regxstr], {type: 'text/plain;charset=utf-8'});
-    blob = new Blob([regxstr], {type: 'dmreg/plain;charset=utf-8'});
-    bloburl = URL.createObjectURL(blob);
-    chrome.downloads.download({url: bloburl, filename: "弹幕规则配置.dmreg"})
-};
+    document.getElementById("import").onchange = function () {
+        if (this.files.length == 0)
+            return;
+        var file = this.files[0];
+        var reader = new FileReader();
+        reader.readAsArrayBuffer(file);
+
+        reader.onload = function() {
+            var str = Utf8ArrayToStr(new Uint8Array(this.result));
+            var regxlist = str.split("\n");
+            console.log(regxlist);
+            regxlist.forEach(function(item){
+                var item = item.trim();
+                var kvi = item.indexOf(":");
+                if (item.length == 0){
+                    console.log("检测到空行, 跳过");
+                }else if (kvi < 0){
+                    console.log("数据不符合条件, 跳过此行:" + item);
+                }else{
+                    var key = item.slice(0, kvi).trim();
+                    var regxstr = item.slice(kvi+1).trim();
+                    updateUList(key, regxstr);
+                }
+            });
+        };
+    };
+
+    document.getElementById("export").onclick = function () {
+        var blob, bloburl, content, regxstr = "";
+        for (var i = 0; i < keylist.length; i ++){
+            regxstr += keylist[i][0] + ": " + keylist[i][1] + "\r\n";
+        }
+        // blob = new Blob([regxstr], {type: 'text/plain;charset=utf-8'});
+        blob = new Blob([regxstr], {type: 'dmreg/plain;charset=utf-8'});
+        bloburl = URL.createObjectURL(blob);
+        chrome.downloads.download({url: bloburl, filename: "弹幕规则配置.dmreg"})
+    };
+}
 
 function addItemToList(info){
     // value, checked

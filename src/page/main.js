@@ -3,25 +3,10 @@ var keylist = [];
 
 document.addEventListener('gotBilid', function(e) {
     console.log("正在发送cid到background.js");
-    if (e.detail.cid != undefined){
-        chrome.runtime.sendMessage({"act": "transcid", "data": e.detail}, function(response) {
-            console.log("已发送cid到background.js");
-        });
-        return;
-    }
-    var xmlhttp=new XMLHttpRequest();
-    var url = "https://api.bilibili.com/x/player/pagelist?bvid="+e.detail.bid+"&jsonp=jsonp";
-    xmlhttp.onreadystatechange=function(){
-        if (xmlhttp.readyState==4 && xmlhttp.status==200){ // 200 = "OK"
-            var resp = JSON.parse(xmlhttp.responseText);;
-            e.detail.cid = resp.data[0].cid;
-            chrome.runtime.sendMessage({"act": "transcid", "data": e.detail}, function(response) {
-                console.log("已发送cid到background.js");
-            });
-        }
-    };
-    xmlhttp.open("GET", url, true);
-    xmlhttp.send(null);
+    chrome.runtime.sendMessage({"act": "transcid", "data": e.detail}, function(response) {
+        console.log("已发送cid到background.js");
+    });
+    return;
 });
 
 chrome.runtime.onMessage.addListener(
