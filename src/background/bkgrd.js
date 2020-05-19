@@ -1,14 +1,15 @@
-// 读取本地弹幕规则 
-filterdata = {};
-linkdata = {};
+// 读取本地弹幕规则
+
+var comfunc = new CompatibleBrowser();
+var filterdata = {};
+var linkdata = {};
+
 chrome.storage.sync.get({"keylist": []}, function(result) {
     updateFilter(result.keylist);
 });
 
-chrome.manifest = chrome.app.getDetails();
-
 function injectIntoTab(tabid) {
-    var scripts = chrome.manifest.content_scripts[0].js;
+    var scripts = comfunc.manifest.content_scripts[0].js;
     for(var i = 0 ; i < scripts.length; i++ ) {
         chrome.tabs.executeScript(tabid, {
             file: scripts[i]
@@ -34,15 +35,36 @@ chrome.windows.getAll({
     }
 });
 
+
+// 接收main.js从网页发来的请求
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     sendResponse({status: "ok"});
+
     var data = request.data;
-    var dmurl = "https://api.bilibili.com/x/v1/dm/list.so?oid=" + data.cid.toString();
     var tabid = data.tabid;
-    console.log("获取到视频页传来的cid" + tabid.toString());
-    linkdata[tabid] = dmurl;
-    console.log("已保存弹幕链接数据" + tabid.toString() + ": " + dmurl)
-    getDanmaku(dmurl, tabid);
+    if (data.cid == undefined){
+        // 并未传来cid
+        var xmlhttp=new XMLHttpRequest();
+        var url = "https://api.bilibili.com/x/player/pagelist?bvid="+data.bid+"&jsonp=jsonp";
+        xmlhttp.onreadystatechange=function(){
+            if (xmlhttp.readyState==4 && xmlhttp.status==200){ // 200 = "OK"
+                var resp = JSON.parse(xmlhttp.responseText);
+                var dmurl = "https://api.bilibili.com/x/v1/dm/list.so?oid=" + resp.data[0].cid.toString();
+                console.log("获取到视频页传来的cid" + tabid.toString());
+                linkdata[tabid] = dmurl;
+                console.log("已保存弹幕链接数据" + tabid.toString() + ": " + dmurl)
+                getDanmaku(dmurl, tabid);
+            }
+        };
+        xmlhttp.open("GET", url, true);
+        xmlhttp.send(null);
+    }else{
+        var dmurl = "https://api.bilibili.com/x/v1/dm/list.so?oid=" + data.cid.toString();
+        console.log("获取到视频页传来的cid" + tabid.toString());
+        linkdata[tabid] = dmurl;
+        console.log("已保存弹幕链接数据" + tabid.toString() + ": " + dmurl)
+        getDanmaku(dmurl, tabid);
+    }
 });
 
 // 页面右键菜单
