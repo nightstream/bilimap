@@ -13,8 +13,7 @@ document.addEventListener('gotBilid', function(e) {
     var url = "https://api.bilibili.com/x/player/pagelist?bvid="+e.detail.bid+"&jsonp=jsonp";
     xmlhttp.onreadystatechange=function(){
         if (xmlhttp.readyState==4 && xmlhttp.status==200){ // 200 = "OK"
-            console.log(xmlhttp);
-            var resp = xmlhttp.responseData;
+            var resp = JSON.parse(xmlhttp.responseText);;
             e.detail.cid = resp.data[0].cid;
             chrome.runtime.sendMessage({"act": "transcid", "data": e.detail}, function(response) {
                 console.log("已发送cid到background.js");
