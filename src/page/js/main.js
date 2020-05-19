@@ -1,11 +1,28 @@
 var editorExtensionId = "afjdebicndobopniobhpjhoaohpihfhm";
 var keylist = [];
 
-document.addEventListener('gotCid', function(e) {
+document.addEventListener('gotBilid', function(e) {
     console.log("正在发送cid到background.js");
-    chrome.runtime.sendMessage({"act": "transcid", "data": e.detail}, function(response) {
-        console.log("已发送cid到background.js");
-    });
+    if (e.detail.cid != undefined){
+        chrome.runtime.sendMessage({"act": "transcid", "data": e.detail}, function(response) {
+            console.log("已发送cid到background.js");
+        });
+        return;
+    }
+    var xmlhttp=new XMLHttpRequest();
+    var url = "https://api.bilibili.com/x/player/pagelist?bvid="+e.detail.bid+"&jsonp=jsonp";
+    xmlhttp.onreadystatechange=function(){
+        if (xmlhttp.readyState==4 && xmlhttp.status==200){ // 200 = "OK"
+            console.log(xmlhttp);
+            var resp = xmlhttp.responseData;
+            e.detail.cid = resp.data[0].cid;
+            chrome.runtime.sendMessage({"act": "transcid", "data": e.detail}, function(response) {
+                console.log("已发送cid到background.js");
+            });
+        }
+    };
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send(null);
 });
 
 chrome.runtime.onMessage.addListener(
@@ -41,9 +58,10 @@ chrome.runtime.onMessage.addListener(
     }else if (act === "getcid"){
         // 注入js脚本
         var jscode = `
-        var vcid = window.__INITIAL_STATE__.epInfo.cid;
+        var bvid = window.__INITIAL_STATE__.bvid;
+        var cid = window.__INITIAL_STATE__.epInfo && window.__INITIAL_STATE__.epInfo.cid;
         var tabid = ${ request.tabid };
-        var evt = new CustomEvent("gotCid", {detail: {cid: vcid, tabid: tabid}});
+        var evt = new CustomEvent("gotBilid", {detail: {bid: bvid, cid: cid, tabid: tabid}});
         // 触发事件，传递视频的cid码
         document.dispatchEvent( evt );
         `;
