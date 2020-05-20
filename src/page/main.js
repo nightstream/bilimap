@@ -6,7 +6,6 @@ document.addEventListener('gotBilid', function(e) {
     chrome.runtime.sendMessage({"act": "transcid", "data": e.detail}, function(response) {
         console.log("已发送cid到background.js");
     });
-    return;
 });
 
 chrome.runtime.onMessage.addListener(
@@ -43,9 +42,9 @@ chrome.runtime.onMessage.addListener(
         // 注入js脚本
         var jscode = `
         var bvid = window.__INITIAL_STATE__.bvid;
-        var cid = window.__INITIAL_STATE__.epInfo && window.__INITIAL_STATE__.epInfo.cid;
+        var bcid = window.__INITIAL_STATE__.epInfo && window.__INITIAL_STATE__.epInfo.cid;
         var tabid = ${ request.tabid };
-        var evt = new CustomEvent("gotBilid", {detail: {bid: bvid, cid: cid, tabid: tabid}});
+        var evt = new CustomEvent("gotBilid", {detail: {bid: bvid, cid: bcid, tabid: tabid}});
         // 触发事件，传递视频的cid码
         document.dispatchEvent( evt );
         `;
