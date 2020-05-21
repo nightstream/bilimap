@@ -31,8 +31,8 @@
 4.鬼畜loop
     基本功能和快捷键:
         起始快捷键:ctrl+alt+shift+z
-        结尾快捷键:ctrl+alt+shift+x
-        取消循环:ctrl+alt+shift+c
+        结尾快捷键:ctrl+alt+shift+z
+        取消循环:ctrl+alt+shift+x
     自定义快捷键
 5.文档说明
     html格式，点击链接之后跳转

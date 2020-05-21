@@ -124,7 +124,7 @@ function regKeyEvent(event){
     }
     var keycode = event.code;
     // 如果按键不是Z键或C键
-    if (!isin(keycode, ["KeyZ", "KeyC"]))
+    if (!isin(keycode, ["KeyZ", "KeyX"]))
         return;
     var video_obj = getVideoObj();
     // 如果没获取到播放器
@@ -132,7 +132,7 @@ function regKeyEvent(event){
         return
 
     var uuid = video_obj.getAttribute("data-loopuid");
-    if (keycode == "KeyC"){
+    if (keycode == "KeyX"){
         // clear
         video_obj.removeEventListener("timeupdate", go2origin);
         if (uuid){
