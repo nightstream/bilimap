@@ -26,6 +26,7 @@
             ],
             "js": [
                 "page/echarts.min.js",
+                "page/func.js",
                 "page/main.js"
             ],
             "run_at": "document_end"
