@@ -1,5 +1,6 @@
 var editorExtensionId = "afjdebicndobopniobhpjhoaohpihfhm";
 var keylist = [];
+var bvregx = /\/video\/BV\w+/;
 
 document.addEventListener('gotBilid', function(e) {
     console.log("正在发送cid到background.js");
@@ -53,6 +54,17 @@ chrome.runtime.onMessage.addListener(
         script.textContent = jscode;
         (document.head||document.documentElement).appendChild(script);
         script.remove();
+    }else if(act == "copyav"){
+        var url = window.location.href;
+        if (!bvregx.test(url))
+            return;
+        var bvlist = bvregx.exec(url);
+        if (bvlist.length < 1)
+            return;
+        console.log(bvlist);
+        var bili = new BiliABV();
+        var avnum = bili.bv2av(bvlist[0].substr(7));
+        window.history.pushState({}, 0, "https://www.bilibili.com/video/"+avnum);
     }
     sendResponse(resp);
 });

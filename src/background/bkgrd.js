@@ -104,6 +104,19 @@ chrome.contextMenus.create({
     documentUrlPatterns: ['https://*.bilibili.com/video*', 'https://*.bilibili.com/bangumi*']
 });
 
+// 页面右键菜单
+chrome.contextMenus.create({
+    title: "地址栏展示av号码链接",
+    onclick: function(param){
+        getCurrentTabId(tabid => {
+            chrome.tabs.sendMessage(tabid,
+                                    {"act": "copyav"}, 
+                                    function(response) {});
+        });
+    },
+    documentUrlPatterns: ['https://*.bilibili.com/video/BV*']
+});
+
 // 地址栏
 chrome.omnibox.onInputChanged.addListener((text, suggest) => {
     var reg = /\d+/;
