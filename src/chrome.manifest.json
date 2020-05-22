@@ -1,6 +1,6 @@
 {
     "name": "bilimap",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "manifest_version": 2,
     "description": "在B站视频页面生成弹幕图表，展示符合特定规则的弹幕在某一时刻的数量。",
     "icons": {
@@ -25,7 +25,9 @@
                 "https://*.bilibili.com/bangumi*"
             ],
             "js": [
+                "page/bignumber.js",
                 "page/echarts.min.js",
+                "page/func.js",
                 "page/main.js"
             ],
             "run_at": "document_end"

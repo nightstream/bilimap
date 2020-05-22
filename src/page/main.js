@@ -1,12 +1,12 @@
 var editorExtensionId = "afjdebicndobopniobhpjhoaohpihfhm";
 var keylist = [];
+var bvregx = /\/video\/BV\w+/;
 
 document.addEventListener('gotBilid', function(e) {
     console.log("正在发送cid到background.js");
     chrome.runtime.sendMessage({"act": "transcid", "data": e.detail}, function(response) {
         console.log("已发送cid到background.js");
     });
-    return;
 });
 
 chrome.runtime.onMessage.addListener(
@@ -43,9 +43,9 @@ chrome.runtime.onMessage.addListener(
         // 注入js脚本
         var jscode = `
         var bvid = window.__INITIAL_STATE__.bvid;
-        var cid = window.__INITIAL_STATE__.epInfo && window.__INITIAL_STATE__.epInfo.cid;
+        var bcid = window.__INITIAL_STATE__.epInfo && window.__INITIAL_STATE__.epInfo.cid;
         var tabid = ${ request.tabid };
-        var evt = new CustomEvent("gotBilid", {detail: {bid: bvid, cid: cid, tabid: tabid}});
+        var evt = new CustomEvent("gotBilid", {detail: {bid: bvid, cid: bcid, tabid: tabid}});
         // 触发事件，传递视频的cid码
         document.dispatchEvent( evt );
         `;
@@ -54,72 +54,21 @@ chrome.runtime.onMessage.addListener(
         script.textContent = jscode;
         (document.head||document.documentElement).appendChild(script);
         script.remove();
+    }else if(act == "copyav"){
+        var url = window.location.href;
+        if (!bvregx.test(url))
+            return;
+        var bvlist = bvregx.exec(url);
+        if (bvlist.length < 1)
+            return;
+        console.log(bvlist);
+        var bili = new BiliABV();
+        var avnum = bili.bv2av(bvlist[0].substr(7));
+        window.history.pushState({}, 0, "https://www.bilibili.com/video/"+avnum);
     }
     sendResponse(resp);
 });
 
-function drawChart(data){
-    var xdata = [];
-    var option = {
-        dataZoom: [
-            {
-                id: 'dataZoomX',
-                type: 'inside',
-                xAxisIndex: [0],
-                filterMode: 'filter'
-            }
-        ],
-        xAxis: {
-            name: "时间(秒)",
-            type: 'category',
-            data: [], // ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        },
-        yAxis: {
-            name: "弹幕数量",
-            type: 'value'
-        },
-        tooltip: {
-            trigger: 'axis',
-            formatter: function (params) {
-                var res = "";
-                var xvalue = parseInt(params[0].name);
-                var minutes = Math.floor(xvalue / 60);
-                var seconds = xvalue % 60;
-                if (minutes > 0)
-                    res = minutes.toString() + "分";
-                res += seconds.toString() + "秒"
-                for (var i = 0; i < params.length; i ++){
-                    var item = params[i];
-                    if (parseInt(item.value) > 0)
-                        res += "<br />" + item.seriesName + ": " + item.value;
-                }
-                return res;
-            },
-            axisPointer: {
-                animation: false
-            }
-        },
-        legend: {
-            data: [],  // ['key1', "key2"]
-        },
-        series: []  // [{type: 'line', name: "名称", data: [数据项]]}, ...]
-    };
-    Object.keys(data.ydata).forEach(function(key){
-        // 遍历对象
-        var seriesitem = {type: 'line', name: key, data: []};
-        var keydata = data.ydata[key];
-
-        for (var i = 0; i <= data.xdata + 1; i ++){
-            var num = keydata[i] === undefined ? 0 : keydata[i];
-            seriesitem.data.push(num);
-        }
-
-        option.legend.data.push(key);
-        option.series.push(seriesitem);
-    });
-    for (var i = 0; i <= data.xdata + 1; i ++)
-        option.xAxis.data.push(i);
-
-    var datachart = echarts.init(document.getElementById('danmakuMap'));
-    datachart.setOption(option);
-}
+document.onkeyup = function(event){
+    regKeyEvent(event);
+};
