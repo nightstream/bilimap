@@ -221,3 +221,48 @@ function drawChart(data){
     var datachart = echarts.init(document.getElementById('danmakuMap'));
     datachart.setOption(option);
 }
+
+function BiliABV(){
+    this.BVSTR = 'fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF';
+    this.BVIDX = [11, 10, 3, 8, 4, 6, 2, 9, 5, 7];
+    this.BVXOR = new BigNumber(20, 1);
+    this.BVADD = new BigNumber(20, 1);
+    this.BVCAST = new BigNumber(20, 1);
+    this.BVADD.from_decimal("100618342136696320");
+    this.BVXOR.from_decimal("177451812");
+    this.BVCAST.from_decimal("58");
+    this.BVDATA = {};
+    for (var i = 0; i < this.BVSTR.length; i ++){
+        this.BVDATA[this.BVSTR[i]] = i;
+    }
+}
+
+BiliABV.prototype.bv2av = function(bvstr){
+    var num = new BigNumber(20, 1);
+    if (!bvstr.startsWith('BV'))
+        bvstr = 'BV' + bvstr;
+    for (var i = 0; i < 10; i ++){
+        var index = new BigNumber(20, 1);
+        var times = new BigNumber(20, 1);
+        index.from_decimal(this.BVDATA[bvstr[this.BVIDX[i]]].toString())
+        times.from_decimal(i.toString());
+        num = num.add(this.BVCAST.pow(times).multiplicate(index));
+    }
+    return 'av' + num.subtract(this.BVADD).xor(this.BVXOR).to_number();
+}
+
+BiliABV.prototype.av2bv = function(avstr){
+    var bvstr = 'BV          '.split("");
+    var avnum = new BigNumber(20, 1);
+    if (avstr.toLowerCase().startsWith("av"))
+        avstr = avstr.substr(2);
+    avnum.from_decimal(avstr);
+    avnum = avnum.xor(this.BVXOR).add(this.BVADD);
+    for (var i = 0; i < 10; i ++){
+        var index = new BigNumber(20, 1);
+        index.from_decimal(i.toString())
+        var i_char = avnum.divide(this.BVCAST.pow(index)).mod(this.BVCAST).to_number();
+        bvstr[this.BVIDX[i]] = this.BVSTR[i_char];
+    }
+    return bvstr.join("");
+}
