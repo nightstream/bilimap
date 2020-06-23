@@ -17,9 +17,7 @@ function getVideoObj(){
 
 function mediaJump(obj, timestamp){
     // 把obj媒体跳转到指定时间
-    if (obj.paused)
-        return;
-    if (timestamp < 0)
+    if (timestamp < 0 || timestamp > obj.duration)
         return;
     obj.pause();
     console.log("jumptime:" + obj.currentTime);
@@ -220,6 +218,14 @@ function drawChart(data){
 
     var datachart = echarts.init(document.getElementById('danmakuMap'));
     datachart.setOption(option);
+    datachart.getZr().on('click',function(params){
+        if (params.offsetY < 20)
+            return;
+        let point=[params.offsetX,params.offsetY];
+        let idx = datachart.convertFromPixel({seriesIndex:0}, point)[0];
+        let obj = getVideoObj();
+        mediaJump(obj, idx);
+    });
 }
 
 function BiliABV(){
