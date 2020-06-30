@@ -120,22 +120,23 @@ chrome.contextMenus.create({
 // 地址栏
 chrome.omnibox.onInputChanged.addListener((text, suggest) => {
     var reg = /\d+/;
+    console.log("[" + new Date() + "] omnibox event: 开始输入: " + text);
     if(!text) return;
     if(reg.test(text)) {
         suggest([
-            {content: '去往->https://www.bilibili.com/av' + text, description: 'https://www.bilibili.com/av' + text}
+            {"content": '去往->https://www.bilibili.com/av' + text, "description": 'https://www.bilibili.com/av' + text}
         ]);
     }
 });
 
 // 当用户接收关键字建议时触发
-chrome.omnibox.onInputEntered.addListener((text) => {
+chrome.omnibox.onInputEntered.addListener((text, disposition) => {
+    console.log("[" + new Date() + "] omnibox event: 已选择: " + text);
     if(!text) return;
     var href = '';
     if(text.startsWith('去往->')) href = text.replace('去往->', '');
     openUrlCurrentTab(href);
 });
-
 // 获取当前选项卡ID
 function getCurrentTabId(callback){
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
