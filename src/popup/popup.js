@@ -124,14 +124,15 @@ function addItemToList(info){
     btn.className = "delbtn";
     btn.onclick = function(e){
         var newkeylist = [];
-        var lis = document.getElementsByClassName("chkbx");
+        var e_list = document.getElementsByClassName("chkbx");
         ul.removeChild(li);
-        for (var i = 0; i < lis.length; i ++){
-            var ele = lis[i];
-            var newv = [ele.innerHTML, ele.value, 0];
-            if (ele.checked)
-                newv[2] = 1;
-            newkeylist.push(newv);
+        for (var i = 0; i < e_list.length; i ++){
+            var e_check = e_list[i];
+            var e_span = e_check.parentElement.getElementsByTagName("span")[0];
+            var new_item = [e_span.innerHTML, e_check.value, 0];
+            if (e_check.checked)
+                new_item[2] = 1;
+            newkeylist.push(new_item);
         }
         keylist = newkeylist;
         backpage.updateFilter(newkeylist);

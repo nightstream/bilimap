@@ -6,6 +6,8 @@
     <style type="text/css">
         body {width: 200px;}
 
+        #switch {cursor: pointer;}
+
         ul#keylist {
             list-style-type: none; 
             width: 100%; 
@@ -17,6 +19,8 @@
             line-height: 14px;
             border-bottom: 1px dashed gray;
         }
+
+        ul#keylist li>span.keyname {cursor: pointer;}
 
         span.keyname {
             display: inline-block;
@@ -37,8 +41,8 @@
         }
 
         #inputbox input{
-            width: 97%;
-            -webkit-width: 98%;
+            width: 95%;
+            -webkit-width: 97%;
         }
 
         #morehandle {
@@ -61,8 +65,8 @@
         <ul id="keylist" style="">
         </ul>
         <div id="inputbox" class="handle">
-            <input type="text" name="key" id="key" placeholder="填入规则名称（必填）">
-            <input type="text" name="regx" id="regx" placeholder="填入弹幕正则表达式（必填）">
+            <input type="text" name="key" id="key" placeholder="填入规则名称（必填）" autocomplete="off">
+            <input type="text" name="regx" id="regx" placeholder="填入弹幕正则表达式（必填）" autocomplete="off">
         </div>
         <div id="morehandle" class="handle" style="width: 0;">
             <input type="file" id="import" name="dmfile" value="从文件导入" accept=".txt,.dmreg">
