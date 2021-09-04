@@ -7,7 +7,7 @@ var loopdata = {};
 
 function getVideoObj(){
     // 查找并返回obj元素下的所有媒体标签 video audio embed object 包含iframe中的元素
-    var div = document.getElementById("bilibiliPlayer");
+    var div = document.getElementById("bilibiliPlayer") || document.getElementById("bilibili-player");
     if (!div)
         return;
     var video = div.getElementsByTagName("video");
