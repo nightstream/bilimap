@@ -1,9 +1,9 @@
 // 点击开启popup页面时触发
-var backpage = chrome.extension.getBackgroundPage();
 var keylist = [];
 var comfunc = new CompatibleBrowser();
 
 chrome.storage.sync.get({"keylist": []}, function(result) {
+    // 从数据库获取数据，渲染到popup列表
     keylist = result.keylist;
     keylist.forEach(function(item){
         addItemToList(item);
@@ -108,7 +108,6 @@ function addItemToList(info){
         if (this.checked)
             v[2] = 1;
         keylist[linum] = v;
-        backpage.updateFilter(keylist);
         chrome.storage.sync.set({"keylist": keylist}, function() {
             console.log("更新完毕");
         });
@@ -135,7 +134,6 @@ function addItemToList(info){
             newkeylist.push(new_item);
         }
         keylist = newkeylist;
-        backpage.updateFilter(newkeylist);
         chrome.storage.sync.set({"keylist": newkeylist}, function() {
             console.log("更新完毕");
         });
@@ -166,7 +164,6 @@ function updateUList(key, regx){
             if (item.innerText == key)
                 chkbox = item.parentElement.getElementsByClassName('chkbx')[0].value = regx;
         }
-        backpage.updateFilter(keylist);
     }
     chrome.storage.sync.set({"keylist": keylist}, function() {
         console.log("更新完毕");

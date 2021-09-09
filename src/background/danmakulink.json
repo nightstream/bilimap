@@ -1,0 +1,10 @@
+[{
+  "id" : 1,
+  "priority": 1,
+  "action" : { "type" : "block" },
+  "condition" : {
+    "urlFilter" : "seg",
+    "domains" : ["api.bilibili.com"],
+    "resourceTypes" : ["other"]
+  }
+}]
