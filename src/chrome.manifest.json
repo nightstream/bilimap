@@ -35,7 +35,7 @@
                 "https://*.bilibili.com/bangumi*"
             ],
             "js": [
-                "content/openshadow.js"
+                "content/regvideoevent.js"
             ],
             "run_at": "document_start"
         }
