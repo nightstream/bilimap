@@ -14,8 +14,7 @@
     },
     "background": {
         "scripts": [
-            "background/cmptb.js",
-            "background/bkgrd.js"
+            "background.js"
         ]
     },
     "content_scripts": [
@@ -27,7 +26,6 @@
             "js": [
                 "content/bignumber.js",
                 "content/echarts.min.js",
-                "content/func.js",
                 "content/main.js"
             ],
             "run_at": "document_end"
@@ -38,18 +36,14 @@
                 "https://*.bilibili.com/bangumi*"
             ],
             "js": [
-                "content/openshadow.js"
+                "content/regvideoevent.js"
             ],
             "run_at": "document_start"
         }
     ],
     "web_accessible_resources": [
-        {
-            "resources": [ "page/pagevideoinfo.js", "page/pagevideoaction.js" ],
-            "matches": [
-                "https://*.bilibili.com/*"
-            ]
-        }
+        "page/pagevideoinfo.js",
+        "page/pagevideoaction.js"
     ],
     "omnibox": { "keyword" : "bav" },
     "permissions": [

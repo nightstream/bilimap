@@ -1,8 +1,44 @@
-// 读取本地弹幕规则
+/**
+浏览器background
+*/
 
-var comfunc = new CompatibleBrowser();
 var filterdata = {};
 var linkdata = {};
+
+// 关于兼容
+function CompatibleBrowser(){
+    this.browsertype = this.getBrowsertype();
+    this.filterdata = {};
+    this.linkdata = {};
+    this.manifest = this.getManifest();
+}
+
+CompatibleBrowser.prototype.getBrowsertype = function() {
+    // 判断浏览器
+    var userAgent = navigator.userAgent;
+    //取得浏览器的userAgent字符串
+    if (userAgent.indexOf("Opera") > -1) {
+        return "opera"
+    }
+    if (userAgent.indexOf("Firefox") > -1) {
+        return "firefox";
+    }
+    if (userAgent.indexOf("Chrome") > -1){
+        return "chrome";
+    }
+    if (userAgent.indexOf("Safari") > -1) {
+        return "safari";
+    }
+    return "";
+};
+
+CompatibleBrowser.prototype.getManifest = function(){
+    if (this.browsertype == "firefox")
+        return browser.runtime.getManifest();
+    return chrome.app.getDetails();
+};
+
+var comfunc = new CompatibleBrowser();
 
 chrome.storage.sync.get({"keylist": []}, function(result) {
     updateFilter(result.keylist);
@@ -11,6 +47,7 @@ chrome.storage.sync.get({"keylist": []}, function(result) {
 function injectIntoTab(tabid) {
     var scripts = comfunc.manifest.content_scripts[0].js;
     for(var i = 0 ; i < scripts.length; i++ ) {
+        console.log(scripts[i]);
         chrome.tabs.executeScript(tabid, {
             file: scripts[i]
         });
@@ -60,9 +97,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         xmlhttp.send(null);
     }else{
         var dmurl = "https://api.bilibili.com/x/v1/dm/list.so?oid=" + data.cid.toString();
-        console.log("获取到视频页传来的cid" + tabid.toString());
+        // console.log("获取到视频页传来的cid" + tabid.toString());
         linkdata[tabid] = dmurl;
-        console.log("已保存弹幕链接数据" + tabid.toString() + ": " + dmurl)
+        // console.log("已保存弹幕链接数据" + tabid.toString() + ": " + dmurl)
         getDanmaku(dmurl, tabid);
     }
 });
