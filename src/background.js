@@ -177,25 +177,15 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
     }
 });
 
-// 地址栏
-chrome.omnibox.onInputChanged.addListener((text, suggest) => {
+// 当用户接收关键字建议时触发
+chrome.omnibox.onInputEntered.addListener((text) => {
     var reg = /\d+/;
-    console.log("[" + new Date() + "] omnibox event: 开始输入: " + text);
+    console.log("[" + new Date() + "] omnibox event: 已输入: " + text);
     if(!text) return;
     if(reg.test(text)) {
-        suggest([
-            {"content": '去往->https://www.bilibili.com/av' + text, "description": 'https://www.bilibili.com/av' + text}
-        ]);
+        let burl = `https://www.bilibili.com/av${text}`;
+        openUrlCurrentTab(burl);
     }
-});
-
-// 当用户接收关键字建议时触发
-chrome.omnibox.onInputEntered.addListener((text, disposition) => {
-    console.log("[" + new Date() + "] omnibox event: 已选择: " + text);
-    if(!text) return;
-    var href = '';
-    if(text.startsWith('去往->')) href = text.replace('去往->', '');
-    openUrlCurrentTab(href);
 });
 
 // 获取当前选项卡ID
@@ -213,15 +203,6 @@ function openUrlCurrentTab(url){
         chrome.tabs.update(tabId, {url: url});
     });
 }
-
-// 监听并过滤网络请求
-// chrome.declarativeNetRequest.onCompleted.addListener(function (details) {
-//     // https://api.bilibili.com/x/v1/dm/list.so?oid=128038821
-//     var regx = /\/v\d+\/dm\/(list\.so|history)\?/;  // 弹幕请求地址
-//     if(regx.test(details.url)) {
-//         linkdata[details.tabId] = details.url;
-//     }
-// }, {urls: ['https://*.bilibili.com/*', 'http://*.bilibili.com/*']});
 
 function parseXml(xmlbody, tabid){
     chrome.tabs.sendMessage(tabid, 

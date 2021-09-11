@@ -53,8 +53,6 @@
         "activeTab",
         "contextMenus",
         "downloads",
-        "declarativeNetRequest",
-        "declarativeNetRequestFeedback",
         "scripting",
         "storage",
         "tabs",
@@ -63,13 +61,6 @@
     "host_permissions": [
         "https://*.bilibili.com/*"
     ],
-    "declarative_net_request" : {
-        "rule_resources" : [{
-          "id": "danmaku",
-          "enabled": true,
-          "path": "background/danmakulink.json"
-        }]
-    },
     "externally_connectable": {
     	"matches": ["*://*.bilibili.com/*"]
     },
