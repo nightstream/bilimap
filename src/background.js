@@ -78,7 +78,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     sendResponse({status: "ok"});
 
     var data = request.data;
-    var tabid = data.tabid;
+    var tabid = sender.tab.id;
     if (data.cid == undefined){
         // 并未传来cid
         var xmlhttp=new XMLHttpRequest();
@@ -154,26 +154,17 @@ chrome.contextMenus.create({
     documentUrlPatterns: ['https://*.bilibili.com/video/BV*']
 });
 
-// 地址栏
-chrome.omnibox.onInputChanged.addListener((text, suggest) => {
+// 当用户接收关键字建议时触发
+chrome.omnibox.onInputEntered.addListener((text, disposition) => {
     var reg = /\d+/;
     console.log("[" + new Date() + "] omnibox event: 开始输入: " + text);
     if(!text) return;
     if(reg.test(text)) {
-        suggest([
-            {"content": '去往->https://www.bilibili.com/av' + text, "description": 'https://www.bilibili.com/av' + text}
-        ]);
+        let href = 'https://www.bilibili.com/av' + text;
+        openUrlCurrentTab(href);
     }
 });
 
-// 当用户接收关键字建议时触发
-chrome.omnibox.onInputEntered.addListener((text, disposition) => {
-    console.log("[" + new Date() + "] omnibox event: 已选择: " + text);
-    if(!text) return;
-    var href = '';
-    if(text.startsWith('去往->')) href = text.replace('去往->', '');
-    openUrlCurrentTab(href);
-});
 // 获取当前选项卡ID
 function getCurrentTabId(callback){
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs){

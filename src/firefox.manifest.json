@@ -1,6 +1,6 @@
 {
     "name": "bilimap",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "manifest_version": 2,
     "description": "在B站视频页面生成弹幕图表，展示符合特定规则的弹幕在某一时刻的数量。",
     "icons": {
@@ -14,8 +14,7 @@
     },
     "background": {
         "scripts": [
-            "background/cmptb.js",
-            "background/bkgrd.js"
+            "background.js"
         ]
     },
     "content_scripts": [
@@ -25,22 +24,35 @@
                 "https://*.bilibili.com/bangumi*"
             ],
             "js": [
-                "page/bignumber.js",
-                "page/echarts.min.js",
-                "page/func.js",
-                "page/main.js"
+                "content/bignumber.js",
+                "content/echarts.min.js",
+                "content/main.js"
             ],
             "run_at": "document_end"
+        },
+        {
+            "matches": [
+                "https://*.bilibili.com/video*",
+                "https://*.bilibili.com/bangumi*"
+            ],
+            "js": [
+                "content/regvideoevent.js"
+            ],
+            "run_at": "document_start"
         }
+    ],
+    "web_accessible_resources": [
+        "page/pagevideoinfo.js",
+        "page/pagevideoaction.js"
     ],
     "omnibox": { "keyword" : "bav" },
     "permissions": [
         "contextMenus",
         "tabs",
+        "activeTab",
         "downloads",
         "webRequest",
         "webRequestBlocking",
-        "notifications",
         "storage",
         "unlimitedStorage",
         "https://*.bilibili.com/*"
