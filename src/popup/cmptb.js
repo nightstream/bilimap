@@ -29,7 +29,7 @@ CompatibleBrowser.prototype.getBrowsertype = function() {
 CompatibleBrowser.prototype.getManifest = function(){
     if (this.browsertype == "firefox")
         return browser.runtime.getManifest();
-    return chrome.app.getDetails();
+    return chrome.runtime.getManifest();
 };
 
 

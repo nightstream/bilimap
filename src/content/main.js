@@ -31,14 +31,15 @@ chrome.runtime.onMessage.addListener(
         }
     }else if (act === "drawchart") {
         var data = getDanmakuList(request.xmlbody, request.filterdata);
-        var parent = document.getElementById("playerWrap") || document.getElementById("review_module");
-        var oldchart = parent.children.danmakuMap;
+        var comment = document.getElementById("comment_module") || document.getElementById("comment");
+        var oldchart = document.getElementById("danmakuMap");
+        if (oldchart != undefined && oldchart != null)
+            oldchart.parentElement.removeChild(oldchart);
+
         var chartdiv = document.createElement("div");
         chartdiv.id = "danmakuMap";
         chartdiv.style = "width: 100%; height: 200px;"
-        if (oldchart != undefined && oldchart != null)
-            parent.removeChild(oldchart);
-        parent.appendChild(chartdiv)
+        comment.parentElement.insertBefore(chartdiv, comment);
         drawChart(data);
     }else if (act === "getcid"){
         // 注入js脚本
