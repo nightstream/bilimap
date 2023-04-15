@@ -1,13 +1,12 @@
 {
     "name": "bilimap",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "manifest_version": 2,
     "description": "在B站视频页面生成弹幕图表，展示符合特定规则的弹幕在某一时刻的数量。",
     "icons": {
         "128": "icon/icon.png"
     },
-    "browser_action": 
-    {
+    "browser_action": {
         "default_icon": "icon/icon.png",
         "default_title": "bilimap",
         "default_popup": "popup/popup.html"
