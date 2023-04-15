@@ -101,7 +101,7 @@ function addItemToList(info){
     chkbx.value = regx;
     if (checked)
         chkbx.checked = true;
-    chkbx.innerHTML = regname;
+    chkbx.textContent = regname;
     chkbx.onchange = function(e){
         var v = keylist[linum];
         v[2] = 0;
@@ -114,7 +114,7 @@ function addItemToList(info){
         });
     };
     span.className = "keyname";
-    span.innerHTML = regname;
+    span.textContent = regname;
     span.onclick = function(e){
         document.getElementById("key").value = regname;
         document.getElementById("regx").value = chkbx.value;
