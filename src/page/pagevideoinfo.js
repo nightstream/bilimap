@@ -19,8 +19,7 @@ function detectPageIds(){
                 console.log(`用户首次访问该番剧, 获取全系列 ${epstr} 中的默认视频 ${epid}`);
             } else {
                 // 否则取用户浏览记录
-                let epindex = window.__NEXT_DATA__.props.pageProps.dehydratedState.queries[1].state.data.userInfo.history.epIndex;
-                epid = window.__NEXT_DATA__.props.pageProps.dehydratedState.queries[0].state.data.initEpList[parseInt(epindex) - 1 ].ep_id;
+                epid = window.__NEXT_DATA__.props.pageProps.dehydratedState.queries[1].state.data.userInfo.history.epId;
                 console.log(`获取到用户访问番剧 ${epstr} 的进度记录:  ${epid}`);
             }
             epstr = epid.toString();

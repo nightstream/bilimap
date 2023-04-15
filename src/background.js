@@ -124,7 +124,7 @@ chrome.contextMenus.create({
         getCurrentTabId(tabid => {
             var dmurl = linkdata[tabid];
             if (dmurl === undefined){
-                console.log("连接数据不存在，即将注入js到视频页面.");
+                console.log("连接数据不存在, 即将注入js到视频页面.");
                 chrome.tabs.sendMessage(tabid,
                                         {"act": "getcid", "tabid": tabid}, 
                                         function(response) {});
