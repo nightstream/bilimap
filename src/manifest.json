@@ -1,6 +1,6 @@
 {
     "name": "bilimap",
-    "version": "1.2.5",
+    "version": "1.2.4",
     "manifest_version": 2,
     "description": "在B站视频页面生成弹幕图表，展示符合特定规则的弹幕在某一时刻的数量。",
     "icons": {
@@ -12,9 +12,7 @@
         "default_popup": "popup/popup.html"
     },
     "background": {
-        "scripts": [
-            "background.js"
-        ]
+        "scripts": ["background.js"]
     },
     "content_scripts": [
         {
@@ -34,9 +32,7 @@
                 "https://*.bilibili.com/video*",
                 "https://*.bilibili.com/bangumi*"
             ],
-            "js": [
-                "content/regvideoevent.js"
-            ],
+            "js": ["content/regvideoevent.js"],
             "run_at": "document_start"
         }
     ],
@@ -44,7 +40,9 @@
         "page/pagevideoinfo.js",
         "page/pagevideoaction.js"
     ],
-    "omnibox": { "keyword" : "bav" },
+    "omnibox": {
+        "keyword": "bav"
+    },
     "permissions": [
         "contextMenus",
         "tabs",

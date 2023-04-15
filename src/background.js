@@ -83,13 +83,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         // 并未传来cid
         var xmlhttp=new XMLHttpRequest();
         var url = "https://api.bilibili.com/x/player/pagelist?bvid="+data.bid+"&jsonp=jsonp";
-        xmlhttp.onreadystatechange=function(){
+        xmlhttp.onreadystatechange = function(){
             if (xmlhttp.readyState==4 && xmlhttp.status==200){ // 200 = "OK"
                 var resp = JSON.parse(xmlhttp.responseText);
                 var dmurl = "https://api.bilibili.com/x/v1/dm/list.so?oid=" + resp.data[0].cid.toString();
-                console.log("获取到视频页传来的cid" + tabid.toString());
-                linkdata[tabid] = dmurl;
-                console.log("已保存弹幕链接数据" + tabid.toString() + ": " + dmurl)
+                console.log("获取到视频页传来的cid" + data.cid.toString());
                 getDanmaku(dmurl, tabid);
             }
         };
@@ -97,9 +95,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         xmlhttp.send(null);
     }else{
         var dmurl = "https://api.bilibili.com/x/v1/dm/list.so?oid=" + data.cid.toString();
-        // console.log("获取到视频页传来的cid" + tabid.toString());
-        linkdata[tabid] = dmurl;
-        // console.log("已保存弹幕链接数据" + tabid.toString() + ": " + dmurl)
+        console.log("获取到视频页传来的cid: " + data.cid.toString());
         getDanmaku(dmurl, tabid);
     }
 });
