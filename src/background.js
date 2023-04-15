@@ -118,9 +118,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                   .catch(error => {console.log(error);})
     }else{
         var dmurl = "https://api.bilibili.com/x/v1/dm/list.so?oid=" + data.cid.toString();
-        console.log("获取到视频页传来的cid" + tabid.toString());
-        linkdata[tabid] = dmurl;
-        console.log("已保存弹幕链接数据" + tabid.toString() + ": " + dmurl)
+        console.log("获取到视频页传来的cid" + data.cid.toString());
         // getDanmaku(dmurl, tabid);
         fetch(dmurl).then(response => response.text()).then(text => parseXml(text, tabid)).catch(error => {console.log(error);});
     }
@@ -161,7 +159,7 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
             getCurrentTabId(tabid => {
                 var dmurl = linkdata[tabid];
                 if (dmurl === undefined){
-                    console.log("连接数据不存在，即将注入js到视频页面.");
+                    console.log("连接数据不存在, 即将注入js到视频页面.");
                     chrome.tabs.sendMessage(tabid,
                                             {"act": "getcid", "tabid": tabid}, 
                                             function(response) {});

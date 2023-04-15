@@ -31,7 +31,7 @@ chrome.runtime.onMessage.addListener(
         }
     }else if (act === "drawchart") {
         var data = getDanmakuList(request.xmlbody, request.filterdata);
-        var comment = document.getElementById("comment_module") || document.getElementById("comment");
+        var comment = document.getElementById("comment-module") || document.getElementById("comment");
         var oldchart = document.getElementById("danmakuMap");
         if (oldchart != undefined && oldchart != null)
             oldchart.parentElement.removeChild(oldchart);
