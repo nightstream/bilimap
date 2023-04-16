@@ -98,9 +98,7 @@ chrome.windows.getAll({populate: true}, function (windows) {
 function getDmUrl(text, tabid){
     var resp = JSON.parse(text);
     var dmurl = "https://api.bilibili.com/x/v1/dm/list.so?oid=" + resp.data[0].cid.toString();
-    console.log("获取到视频页传来的cid" + tabid.toString());
-    linkdata[tabid] = dmurl;
-    console.log("已保存弹幕链接数据" + tabid.toString() + ": " + dmurl)
+    console.log("根据bid查询到视频页面使用的cid: " + resp.data[0].cid.toString());
     // getDanmaku(dmurl, tabid);
     fetch(dmurl).then(response => response.text()).then(text => parseXml(text, tabid)).catch(error => {console.log(error);})
 }
