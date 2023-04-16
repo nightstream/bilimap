@@ -87,7 +87,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             if (xmlhttp.readyState==4 && xmlhttp.status==200){ // 200 = "OK"
                 var resp = JSON.parse(xmlhttp.responseText);
                 var dmurl = "https://api.bilibili.com/x/v1/dm/list.so?oid=" + resp.data[0].cid.toString();
-                console.log("获取到视频页传来的cid" + data.cid.toString());
+                console.log("根据bid查询到视频页面使用的cid: " + resp.data[0].cid.toString());
                 getDanmaku(dmurl, tabid);
             }
         };
