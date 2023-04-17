@@ -146,21 +146,22 @@ chrome.contextMenus.create({
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
     switch (info.menuItemId){
         case 'getheadimg':
-            chrome.tabs.sendMessage(tab.id, {"act": "getimg"}, 
-                                    function(response) {
-                                        console.log("获取到图片地址, 开始下载: " + response.imgurl);
-                                        if (response.imgurl != undefined)
-                                            chrome.downloads.download({url: response.imgurl});
-                                    });
+            chrome.tabs.sendMessage(tab.id, {"act": "getimg"})
+                       .then((response) => {
+                            console.log("获取到图片地址, 开始下载: " + response.imgurl);
+                            if (response.imgurl != undefined)
+                                chrome.downloads.download({url: response.imgurl});
+                        })
+                        .catch(e => {console.log("下载封面的消息出现异常: " + e);});
             break;
         case "showcharts":
             getCurrentTabId(tabid => {
                 var dmurl = linkdata[tabid];
                 if (dmurl === undefined){
                     console.log("连接数据不存在, 即将注入js到视频页面.");
-                    chrome.tabs.sendMessage(tabid,
-                                            {"act": "getcid", "tabid": tabid}, 
-                                            function(response) {});
+                    chrome.tabs.sendMessage(tabid, {"act": "getcid", "tabid": tabid})
+                               .then(resp => {console.log("tab页正在处理展示图表的消息。");})
+                               .catch(e => {console.log("展示弹幕图表的消息出现异常: " + e);});
                 }else{
                     console.log("读取链接成功" + tabid.toString())
                     getDanmaku(dmurl, tabid);
@@ -168,7 +169,9 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
             });
             break;
         case "getavnum":
-            chrome.tabs.sendMessage(tab.id, {"act": "copyav"}, function(response) {});
+            chrome.tabs.sendMessage(tab.id, {"act": "copyav"})
+                  .then((response) => {console.log("tab页正在处理展示av号的消息。");})
+                  .catch(e => {console.log("展示av号的消息出现异常: " + e);});
             break;
     }
 });

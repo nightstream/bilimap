@@ -51,8 +51,10 @@ if (comfunc.getBrowsertype() == "chrome"){
         var file = this.files[0];
         var reader = new FileReader();
         reader.readAsArrayBuffer(file);
+        document.getElementById("import").value = "";
 
-        reader.onload = function() {
+        reader.onloadend = function () {
+            console.log("加载开始");
             var str = Utf8ArrayToStr(new Uint8Array(this.result));
             var regxlist = str.split("\n");
             console.log(regxlist);

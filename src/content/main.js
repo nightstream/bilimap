@@ -5,59 +5,63 @@ var currentTabId = 0;
 
 document.addEventListener('gotBilid', function(e) {
     console.log("正在发送cid到background.js");
-    chrome.runtime.sendMessage({"act": "transcid", "data": e.detail, "tabid": currentTabId}, function(response) {
-        console.log("已发送cid到background.js");
-    });
+    chrome.runtime.sendMessage({"act": "transcid", "data": e.detail, "tabid": currentTabId})
+          .then(response => {console.log("已发送cid到background.js");});
 });
 
 chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-    currentTabId = request.tabid;
-    var act = request.act;
-    var resp = {status: "ok"};
-    if (act === "getimg"){
-        var metalist = document.getElementsByTagName("meta");
-        for (var i = 0; i < metalist.length; i ++){
-            var item = metalist[i];
-            var name = item.attributes['itemprop'] || item.attributes["property"];
-            console.log(item);
-            if (name === undefined)
-                continue
-            if (name.value == "image" || name.value == "og:image"){
-                var addr = item.attributes["content"].value;
-                resp.imgurl = addr;
-                break;
+    (request, sender, sendResponse) => {
+        currentTabId = request.tabid;
+        var act = request.act;
+        var resp = {status: "ok"};
+        if (act === "getimg"){
+            console.log("接到菜单数据, 准备下载封面");
+            var metalist = document.getElementsByTagName("meta");
+            for (var i = 0; i < metalist.length; i ++){
+                var item = metalist[i];
+                var name = item.attributes['itemprop'] || item.attributes["property"];
+                if (name === undefined)
+                    continue
+                if (name.value == "image" || name.value == "og:image"){
+                    var addr = item.attributes["content"].value.split("@")[0];
+                    if (addr.startsWith("//")) {
+                        addr = "https:" + addr
+                    }
+                    resp.imgurl = addr;
+                    break;
+                }
             }
-        }
-    }else if (act === "drawchart") {
-        var data = getDanmakuList(request.xmlbody, request.filterdata);
-        var comment = document.getElementById("comment-module") || document.getElementById("comment");
-        var oldchart = document.getElementById("danmakuMap");
-        if (oldchart != undefined && oldchart != null)
-            oldchart.parentElement.removeChild(oldchart);
+        }else if (act === "drawchart") {
+            console.log("接到弹幕数据, 开始作图");
+            var data = getDanmakuList(request.xmlbody, request.filterdata);
+            var comment = document.getElementById("comment-module") || document.getElementById("comment");
+            var oldchart = document.getElementById("danmakuMap");
+            if (oldchart != undefined && oldchart != null)
+                oldchart.parentElement.removeChild(oldchart);
 
-        var chartdiv = document.createElement("div");
-        chartdiv.id = "danmakuMap";
-        chartdiv.style = "width: 100%; height: 200px;"
-        comment.parentElement.insertBefore(chartdiv, comment);
-        drawChart(data);
-    }else if (act === "getcid"){
-        // 注入js脚本
-        injectedFunction();
-    }else if(act == "copyav"){
-        var url = window.location.href;
-        if (!bvregx.test(url))
-            return;
-        var bvlist = bvregx.exec(url);
-        if (bvlist.length < 1)
-            return;
-        console.log(bvlist);
-        var bili = new BiliABV();
-        var avnum = bili.bv2av(bvlist[0].substr(7));
-        window.history.pushState({}, 0, "https://www.bilibili.com/video/"+avnum);
-    }
-    sendResponse(resp);
-});
+            var chartdiv = document.createElement("div");
+            chartdiv.id = "danmakuMap";
+            chartdiv.style = "width: 100%; height: 200px;"
+            comment.parentElement.insertBefore(chartdiv, comment);
+            drawChart(data);
+        }else if (act === "getcid"){
+            // 注入js脚本
+            console.log("接到脚本消息, 探测页面的id信息");
+            injectedFunction();
+        }else if(act == "copyav"){
+            var url = window.location.href;
+            if (!bvregx.test(url))
+                return;
+            var bvlist = bvregx.exec(url);
+            if (bvlist.length < 1)
+                return;
+            console.log(bvlist);
+            var bili = new BiliABV();
+            var avnum = bili.bv2av(bvlist[0].substr(7));
+            window.history.pushState({}, 0, "https://www.bilibili.com/video/"+avnum);
+        }
+        sendResponse(resp);
+    });
 
 function injectedFunction() {
     var script = document.createElement('script');
