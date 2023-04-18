@@ -1,29 +1,37 @@
 var editorExtensionId = "afjdebicndobopniobhpjhoaohpihfhm";
-var keylist = [];
-var bvregx = /\/video\/BV\w+/;
-var currentTabId = 0;
 
 document.addEventListener('gotBilid', function(e) {
-    console.log("正在发送cid到background.js");
-    chrome.runtime.sendMessage({"act": "transcid", "data": e.detail, "tabid": currentTabId})
-          .then(response => {console.log("已发送cid到background.js");});
+    // injectedFunction -> 注入pagevideoinfo.js -> 读取页面变量 -> 触发gotBilid事件并传回数据
+    if (e.detail.cid == undefined){
+        // 并未获得cid
+        let url = "https://api.bilibili.com/x/player/pagelist?bvid="+e.detail.bid+"&jsonp=jsonp";
+        fetch(url).then(response => response.text())
+                    .then(text => getDmUrl(text))
+                    .catch(error => {console.log(error);})
+    }else{
+        let dmurl = "https://api.bilibili.com/x/v1/dm/list.so?oid=" + e.detail.cid.toString();
+        console.log("获取到当前页面的cid: " + e.detail.cid.toString());
+        fetch(dmurl).then(response => response.text())
+                    .then(text => parseXml(text))
+                    .catch(error => {console.log(error);});
+    }
 });
 
 chrome.runtime.onMessage.addListener(
     (request, sender, sendResponse) => {
         currentTabId = request.tabid;
-        var act = request.act;
-        var resp = {status: "ok"};
+        let act = request.act;
+        let resp = {status: "ok"};
         if (act === "getimg"){
             console.log("接到菜单数据, 准备下载封面");
-            var metalist = document.getElementsByTagName("meta");
-            for (var i = 0; i < metalist.length; i ++){
-                var item = metalist[i];
-                var name = item.attributes['itemprop'] || item.attributes["property"];
+            let metalist = document.getElementsByTagName("meta");
+            for (let i = 0; i < metalist.length; i ++){
+                let item = metalist[i];
+                let name = item.attributes['itemprop'] || item.attributes["property"];
                 if (name === undefined)
                     continue
                 if (name.value == "image" || name.value == "og:image"){
-                    var addr = item.attributes["content"].value.split("@")[0];
+                    let addr = item.attributes["content"].value.split("@")[0];
                     if (addr.startsWith("//")) {
                         addr = "https:" + addr
                     }
@@ -31,88 +39,22 @@ chrome.runtime.onMessage.addListener(
                     break;
                 }
             }
-        }else if (act === "drawchart") {
-            console.log("接到弹幕数据, 开始作图");
-            var data = getDanmakuList(request.xmlbody, request.filterdata);
-            var comment = document.getElementById("comment-module") || document.getElementById("comment");
-            var oldchart = document.getElementById("danmakuMap");
-            if (oldchart != undefined && oldchart != null)
-                oldchart.parentElement.removeChild(oldchart);
-
-            var chartdiv = document.createElement("div");
-            chartdiv.id = "danmakuMap";
-            chartdiv.style = "width: 100%; height: 200px;"
-            comment.parentElement.insertBefore(chartdiv, comment);
-            drawChart(data);
         }else if (act === "getcid"){
             // 注入js脚本
             console.log("接到脚本消息, 探测页面的id信息");
             injectedFunction();
         }else if(act == "copyav"){
-            var url = window.location.href;
+            let url = window.location.href;
+            let bvregx = /\/video\/BV\w+/;
             if (!bvregx.test(url))
                 return;
-            var bvlist = bvregx.exec(url);
+            let bvlist = bvregx.exec(url);
             if (bvlist.length < 1)
                 return;
             console.log(bvlist);
-            var bili = new BiliABV();
-            var avnum = bili.bv2av(bvlist[0].substr(7));
+            let bili = new BiliABV();
+            let avnum = bili.bv2av(bvlist[0].substr(7));
             window.history.pushState({}, 0, "https://www.bilibili.com/video/"+avnum);
         }
         sendResponse(resp);
     });
-
-function injectedFunction() {
-    var script = document.createElement('script');
-    script.setAttribute("type", "text/javascript");
-    script.src = chrome.runtime.getURL("page/pagevideoinfo.js");
-    (document.head||document.documentElement).appendChild(script);
-    script.remove();  // 执行一次就删除
-}
-
-// 解析弹幕xml
-function getDanmakuList(xmlstring, filterdata){
-    // var regx = /\<d\s+p\=\"([\w\,\.]+)\"\>(.+)\<\/d\>/g;
-    var domParser = new DOMParser();
-    var xmldata = domParser.parseFromString(xmlstring, 'text/xml');
-    var dmlist = xmldata.documentElement.getElementsByTagName("d");
-    var ydata = {};
-    var max_x = 0;  // 记录最终弹幕时间
-    // regx.compile(regx);
-    Object.keys(filterdata).forEach(function(key){
-        filterdata[key] = new RegExp(filterdata[key], "gi");
-    });
-    for (var i = 0; i < dmlist.length; i ++){
-        var item = dmlist[i];
-        var dmstr = item.textContent;  // 弹幕内容
-        var param = item.attributes['p'].value.split(",");
-        var pgtime = parseFloat(param[0]);  // 进度条时间
-        var dateobj = new Date(parseInt(param[4]) * 1000);  // 弹幕发送时间
-
-        if (pgtime > max_x)
-            max_x = pgtime;
-
-        var keydata = checkFilter(dmstr, filterdata);  // 检测通过的keyname
-        Object.keys(keydata).forEach(function(key){
-            ydata[key] = ydata[key] == undefined ? {} : ydata[key];
-            for (var i = Math.floor(pgtime); i < Math.floor(pgtime) + 6; i ++){
-                ydata[key][i] = ydata[key][i] === undefined ? 0 : ydata[key][i];
-                ydata[key][i] += keydata[key];
-            }
-        });
-    };
-    return {"xdata": max_x, "ydata": ydata};
-}
-
-function checkFilter(dmstr, filterdata){
-    // 检测弹幕符合哪些条件
-    var keydata = {};
-    Object.keys(filterdata).forEach(function(key){
-        var num = dmstr.match(filterdata[key]);
-        if (num != null && num != undefined) {
-            keydata[key] = num.length;
-        }
-    });
-    return keydata;
-}

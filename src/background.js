@@ -1,7 +1,7 @@
 // 读取本地弹幕规则
 
-let filterdata = {};
-let linkdata = {};
+var filterdata = {};
+var linkdata = {};
 
 // 关于兼容firefox和chrome
 function CompatibleBrowser(){
@@ -50,13 +50,17 @@ function updateFilter(filterlist){
 }
 
 chrome.runtime.onInstalled.addListener(() => {
-    console.log('插件已安装');
+    console.log('bilimap插件已安装');
 });
 
 // 读取用户配置，更新变量
-chrome.storage.sync.get({"keylist": []}, function(result) {
-    updateFilter(result.keylist);
-});
+chrome.storage.sync.get({"keylist": []})
+      .then(result => {
+                updateFilter(result.keylist);
+            },
+            err => {
+                console.log("读取用户配置失败" + err.toString())
+            });
 
 // 检测到storage变化自动更新变量
 chrome.storage.onChanged.addListener(function (changes, namespace) {
@@ -73,75 +77,54 @@ function injectIntoTab(tabid) {
     let scripts = comfunc.manifest.content_scripts[0].js;
     for(var i = 0 ; i < scripts.length; i++ ) {
         console.log("检测到脚本: ", scripts[i]);
-        chrome.scripting.executeScript({target: {tabId: tabid}, files: [scripts[i]]},
-                                       () => { console.log("脚本执行完毕: ", tabid) });
+        chrome.scripting.executeScript({target: {tabId: tabid}, files: [scripts[i]]})
+              .then(
+                (res) => { console.log("脚本执行完毕: ", tabid, res.toString()); },
+                (err) => { console.log("脚本注入失败: ", tabid, err.toString()); }
+              );
     }
 }
 
 // Get all windows
-chrome.windows.getAll({populate: true}, function (windows) {
-    var i = 0, w = windows.length, currentWindow;
-    for( ; i < w; i++ ) {
-        currentWindow = windows[i];
-        var j = 0, t = currentWindow.tabs.length, currentTab;
-        for( ; j < t; j++ ) {
-            currentTab = currentWindow.tabs[j];
-            if( currentTab.url.match(/https:\/\/(.+\.)?bilibili.com\/(video|bangumi)/gi) ) {
-                console.log(currentTab.id);
-                injectIntoTab(currentTab.id);
-            }
-        }
-    }
-});
-
-// 获取弹幕url
-function getDmUrl(text, tabid){
-    var resp = JSON.parse(text);
-    var dmurl = "https://api.bilibili.com/x/v1/dm/list.so?oid=" + resp.data[0].cid.toString();
-    console.log("根据bid查询到视频页面使用的cid: " + resp.data[0].cid.toString());
-    // getDanmaku(dmurl, tabid);
-    fetch(dmurl).then(response => response.text()).then(text => parseXml(text, tabid)).catch(error => {console.log(error);})
-}
+chrome.windows.getAll({populate: true})
+      .then(windows => {
+                var i = 0, w = windows.length, currentWindow;
+                for( ; i < w; i++ ) {
+                    currentWindow = windows[i];
+                    var j = 0, t = currentWindow.tabs.length, currentTab;
+                    for( ; j < t; j++ ) {
+                        currentTab = currentWindow.tabs[j];
+                        if( currentTab.url.match(/https:\/\/(.+\.)?bilibili.com\/(video|bangumi)/gi) ) {
+                            console.log("探测到标签页符合条件: ", currentTab.id);
+                            injectIntoTab(currentTab.id);
+                        }
+                    }
+                }
+            });
 
 // 接收main.js从网页发来的请求
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    sendResponse({status: "ok"});
-    var data = request.data;
-    var tabid = request.tabid;
-    if (data.cid == undefined){
-        // 并未传来cid
-        var url = "https://api.bilibili.com/x/player/pagelist?bvid="+data.bid+"&jsonp=jsonp";
-        fetch(url).then(response => response.text())
-                  .then(text => getDmUrl(text, tabid))
-                  .catch(error => {console.log(error);})
-    }else{
-        var dmurl = "https://api.bilibili.com/x/v1/dm/list.so?oid=" + data.cid.toString();
-        console.log("获取到视频页传来的cid" + data.cid.toString());
-        // getDanmaku(dmurl, tabid);
-        fetch(dmurl).then(response => response.text()).then(text => parseXml(text, tabid)).catch(error => {console.log(error);});
-    }
+    console.log("传送弹幕过滤设置...");
+    sendResponse({data: filterdata});
 });
 
 // 页面右键菜单
-chrome.contextMenus.create({
-    id: "getheadimg",
-    title: "获取封面图片",
-    documentUrlPatterns: ['https://*.bilibili.com/video*', 'https://*.bilibili.com/bangumi*']
-});
+chrome.contextMenus.create({id: "getheadimg",
+                            title: "获取封面图片",
+                            documentUrlPatterns: ['https://*.bilibili.com/video*', 'https://*.bilibili.com/bangumi*']},
+                            () => {void chrome.runtime.lastError;});
 
 // 页面右键菜单
-chrome.contextMenus.create({
-    id: "showcharts",
-    title: "展示弹幕地图",
-    documentUrlPatterns: ['https://*.bilibili.com/video*', 'https://*.bilibili.com/bangumi*']
-});
+chrome.contextMenus.create({id: "showcharts",
+                            title: "展示弹幕地图",
+                            documentUrlPatterns: ['https://*.bilibili.com/video*', 'https://*.bilibili.com/bangumi*']},
+                            () => {void chrome.runtime.lastError;});
 
 // 页面右键菜单
-chrome.contextMenus.create({
-    id: "getavnum",
-    title: "地址栏展示av号码链接",
-    documentUrlPatterns: ['https://*.bilibili.com/video/BV*']
-});
+chrome.contextMenus.create({id: "getavnum",
+                            title: "地址栏展示av号码链接",
+                            documentUrlPatterns: ['https://*.bilibili.com/video/BV*']},
+                            () => {void chrome.runtime.lastError;});
 
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
     switch (info.menuItemId){
@@ -156,16 +139,10 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
             break;
         case "showcharts":
             getCurrentTabId(tabid => {
-                var dmurl = linkdata[tabid];
-                if (dmurl === undefined){
-                    console.log("连接数据不存在, 即将注入js到视频页面.");
-                    chrome.tabs.sendMessage(tabid, {"act": "getcid", "tabid": tabid})
-                               .then(resp => {console.log("tab页正在处理展示图表的消息。");})
-                               .catch(e => {console.log("展示弹幕图表的消息出现异常: " + e);});
-                }else{
-                    console.log("读取链接成功" + tabid.toString())
-                    getDanmaku(dmurl, tabid);
-                }
+                console.log("注入js到视频页面, 获取页面id信息.");
+                chrome.tabs.sendMessage(tabid, {"act": "getcid", "tabid": tabid})
+                            .then(resp => {console.log("tab页正在处理展示图表的消息。");})
+                            .catch(e => {console.log("展示弹幕图表的消息出现异常: " + e);});
             });
             break;
         case "getavnum":
@@ -178,7 +155,7 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
 
 // 当用户接收关键字建议时触发
 chrome.omnibox.onInputEntered.addListener((text) => {
-    var reg = /\d+/;
+    var reg = /^\d+(\?p\=\d+)?$/;
     console.log("[" + new Date() + "] omnibox event: 已输入: " + text);
     if(!text) return;
     if(reg.test(text)) {
@@ -187,7 +164,7 @@ chrome.omnibox.onInputEntered.addListener((text) => {
     }
 });
 
-// 获取当前选项卡ID
+// 获取当前选项卡ID并执行回调
 function getCurrentTabId(callback){
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
         var tabid = tabs.length ? tabs[0].id: null;
@@ -201,16 +178,4 @@ function openUrlCurrentTab(url){
     getCurrentTabId(tabId => {
         chrome.tabs.update(tabId, {url: url});
     });
-}
-
-function parseXml(xmlbody, tabid){
-    chrome.tabs.sendMessage(tabid, 
-                            {"act": "drawchart", "xmlbody": xmlbody, "filterdata": filterdata}, 
-                            function(response) {console.log("发送图表数据到页面")});
-}
-
-// ajax获取弹幕
-function getDanmaku(url, tabid){
-    fetch(url).then(response => response.text()).then(text => parseXml(text, tabid)).catch(error => {console.log(error);});
-    return true;
 }

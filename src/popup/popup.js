@@ -14,7 +14,7 @@ chrome.storage.sync.get({"keylist": []}, function(result) {
 document.getElementById("key").onkeyup = function(e){
     if (e.keyCode === 13){
         // 回车键
-        var key = this.value.trim();
+        let key = this.value.trim();
         if (key.length > 0)
             document.getElementById("regx").focus();
     }
@@ -23,8 +23,8 @@ document.getElementById("key").onkeyup = function(e){
 document.getElementById("regx").onkeyup = function(e){
     if (e.keyCode === 13){
         // 回车键
-        var regx = this.value;
-        var key = document.getElementById("key").value.trim();
+        let regx = this.value;
+        let key = document.getElementById("key").value.trim();
         if (key.length > 0 && regx.length > 0){
             updateUList(key, regx);
             this.value = "";
@@ -48,26 +48,26 @@ if (comfunc.getBrowsertype() == "chrome"){
     document.getElementById("import").onchange = function () {
         if (this.files.length == 0)
             return;
-        var file = this.files[0];
-        var reader = new FileReader();
+        let file = this.files[0];
+        let reader = new FileReader();
         reader.readAsArrayBuffer(file);
         document.getElementById("import").value = "";
 
         reader.onloadend = function () {
             console.log("加载开始");
-            var str = Utf8ArrayToStr(new Uint8Array(this.result));
-            var regxlist = str.split("\n");
+            let str = Utf8ArrayToStr(new Uint8Array(this.result));
+            let regxlist = str.split("\n");
             console.log(regxlist);
             regxlist.forEach(function(item){
-                var item = item.trim();
-                var kvi = item.indexOf(":");
+                item = item.trim();
+                let kvi = item.indexOf(":");
                 if (item.length == 0){
                     console.log("检测到空行, 跳过");
                 }else if (kvi < 0){
                     console.log("数据不符合条件, 跳过此行:" + item);
                 }else{
-                    var key = item.slice(0, kvi).trim();
-                    var regxstr = item.slice(kvi+1).trim();
+                    let key = item.slice(0, kvi).trim();
+                    let regxstr = item.slice(kvi+1).trim();
                     updateUList(key, regxstr);
                 }
             });
@@ -75,8 +75,8 @@ if (comfunc.getBrowsertype() == "chrome"){
     };
 
     document.getElementById("export").onclick = function () {
-        var blob, bloburl, content, regxstr = "";
-        for (var i = 0; i < keylist.length; i ++){
+        let blob, bloburl, content, regxstr = "";
+        for (let i = 0; i < keylist.length; i ++){
             regxstr += keylist[i][0] + ": " + keylist[i][1] + "\r\n";
         }
         // blob = new Blob([regxstr], {type: 'text/plain;charset=utf-8'});
@@ -89,15 +89,15 @@ if (comfunc.getBrowsertype() == "chrome"){
 function addItemToList(info){
     // value, checked
     // <li><input type="checkbox" class="chkbx" value=""><span>value</span></span></li>
-    var regname = info[0];
-    var regx = info[1];
-    var checked = (info[2] == 1);
-    var ul = document.getElementById("keylist");
-    var li = document.createElement('li');
-    var chkbx = document.createElement("input");
-    var linum = document.getElementsByClassName("chkbx").length;
-    var span = document.createElement("span");
-    var btn = document.createElement("input");
+    let regname = info[0];
+    let regx = info[1];
+    let checked = (info[2] == 1);
+    let ul = document.getElementById("keylist");
+    let li = document.createElement('li');
+    let chkbx = document.createElement("input");
+    let linum = document.getElementsByClassName("chkbx").length;
+    let span = document.createElement("span");
+    let btn = document.createElement("input");
     chkbx.type = "checkbox";
     chkbx.className = "chkbx";
     chkbx.value = regx;
@@ -105,7 +105,7 @@ function addItemToList(info){
         chkbx.checked = true;
     chkbx.innerHTML = regname;
     chkbx.onchange = function(e){
-        var v = keylist[linum];
+        let v = keylist[linum];
         v[2] = 0;
         if (this.checked)
             v[2] = 1;
@@ -124,13 +124,13 @@ function addItemToList(info){
     btn.value = "删除";
     btn.className = "delbtn";
     btn.onclick = function(e){
-        var newkeylist = [];
-        var e_list = document.getElementsByClassName("chkbx");
+        let newkeylist = [];
+        let e_list = document.getElementsByClassName("chkbx");
         ul.removeChild(li);
-        for (var i = 0; i < e_list.length; i ++){
-            var e_check = e_list[i];
-            var e_span = e_check.parentElement.getElementsByTagName("span")[0];
-            var new_item = [e_span.innerHTML, e_check.value, 0];
+        for (let i = 0; i < e_list.length; i ++){
+            let e_check = e_list[i];
+            let e_span = e_check.parentElement.getElementsByTagName("span")[0];
+            let new_item = [e_span.innerHTML, e_check.value, 0];
             if (e_check.checked)
                 new_item[2] = 1;
             newkeylist.push(new_item);
@@ -148,8 +148,8 @@ function addItemToList(info){
 
 function updateUList(key, regx){
     // 更新ul列表
-    var flag = true;
-    for (var i = 0; i < keylist.length; i ++){
+    let flag = true;
+    for (let i = 0; i < keylist.length; i ++){
         if (keylist[i][0] == key){
             keylist[i][1] = regx;
             flag = false;
@@ -160,9 +160,9 @@ function updateUList(key, regx){
         keylist.push([key, regx, 0]);
         addItemToList([key, regx, 0]);
     }else{
-        var spans = document.getElementsByClassName("keyname");
-        for (var i = 0; i < spans.length; i ++){
-            var item = spans[i];
+        let spans = document.getElementsByClassName("keyname");
+        for (let i = 0; i < spans.length; i ++){
+            let item = spans[i];
             if (item.innerText == key)
                 chkbox = item.parentElement.getElementsByClassName('chkbx')[0].value = regx;
         }
@@ -173,14 +173,13 @@ function updateUList(key, regx){
 }
 
 function Utf8ArrayToStr(array) {
-    var out,i,len,c;
-    var char2,char3;
+    let char2,char3;
 
-    out = "";
-    len = array.length;
-    i = 0;
+    let out = "";
+    let len = array.length;
+    let i = 0;
     while(i < len) {
-        c = array[i++];
+        let c = array[i++];
         switch(c >> 4) {
             case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
                 // 0xxxxxxx

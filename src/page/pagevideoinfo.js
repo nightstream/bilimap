@@ -3,6 +3,10 @@ function detectPageIds(){
     if (window.__INITIAL_STATE__ != undefined){
         let bvid = window.__INITIAL_STATE__.bvid;
         let bcid = window.__INITIAL_STATE__.epInfo && window.__INITIAL_STATE__.epInfo.cid;
+        if (bcid == undefined ){
+            let emap = window.__INITIAL_STATE__.cidMap;
+            bcid = emap[bvid].cids[1];
+        }
         console.log(`BV页面, 存在__INITIAL_STATE__属性, bvid, bcid: ${bvid} ${bcid}`);
         return {bid: bvid, cid: bcid};
     }
