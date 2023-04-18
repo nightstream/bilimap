@@ -9,7 +9,7 @@ function CompatibleBrowser(){
 
 CompatibleBrowser.prototype.getBrowsertype = function() {
     // 判断浏览器
-    var userAgent = navigator.userAgent;
+    let userAgent = navigator.userAgent;
     //取得浏览器的userAgent字符串
     if (userAgent.indexOf("Opera") > -1) {
         return "opera"
@@ -29,7 +29,7 @@ CompatibleBrowser.prototype.getBrowsertype = function() {
 CompatibleBrowser.prototype.getManifest = function(){
     if (this.browsertype == "firefox")
         return browser.runtime.getManifest();
-    return chrome.app.getDetails();
+    return chrome.runtime.getManifest();
 };
 
 
